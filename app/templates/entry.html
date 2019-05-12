@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Entry{% endblock %}
+
+{% block heading %}Enter Measurements{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col">
+            <form action="" method="POST" novalidate>
+                {% for field in form %}
+                    <div class="form-group row">
+                            {% if field.type == "DecimalField" %}
+                                {{ field.label(class="col-4 col-form-label") }}
+                                <div class="col">
+                                    {{ field(size=32, class="form-control", type="number") }}
+                                </div>
+                            {% elif field.type == "SelectField" %}
+                                {{ field.label(class="col-4 col-form-label") }}
+                                <div class="col">
+                                    {{ field(class="custom-select") }}
+                                </div>
+                            {% else  %}
+                                <div class="col">
+                                    {{ field(class="form-control btn btn-complimentary") }}
+                                </div>
+                            {% endif %}
+                    </div>
+                {% endfor %}
+            </form>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,14 @@
+body {
+    background-color: #000020;
+    color: #c0c0c0;
+}
+
+.complimentary, .bg-complimentary {
+    background-color: #200010;
+}
+
+.btn-complimentary {
+    color: #fff;
+    background-color: #200010;
+    border-color: #200010;
+}
