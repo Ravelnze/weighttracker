@@ -2,8 +2,6 @@ from app import app, db
 from flask import render_template, flash, redirect
 from app.models import User, UserMeasurement
 from app.forms import EntryForm
-from app.encoders import DecimalEncoder
-import json
 
 @app.route('/', methods=['GET', 'POST'])
 def entry():
