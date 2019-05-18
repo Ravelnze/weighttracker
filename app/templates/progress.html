@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block title %}{{ context.user.name }}{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='chart/css/chart.min.css') }}" />
+    <script src="{{ url_for('static', filename='chart/js/chart.min.js') }}"></script>
+{% endblock %}
+
+{% block heading %}Progress{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <!--Graph-->
+        <div class="col-md">
+                <div class="row">
+                    <div class="col">
+                        <button class="btn btn-complimentary float-right" onclick="toggleLegend()">Toggle Legend</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="mb-4">
+                            <canvas id='chart' width='300' height='200'></canvas>
+                        </div>
+                    </div>
+                </div>
+        </div>
+
+        <!--Table-->
+        <div class="col-md">
+            <table class="table table-dark">
+                <thead>
+                    <tr>
+                        <th></th>
+                        {% for d in context.table_data %}
+                            <th>{{ d.timestamp.strftime('%d-%m') }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in context.labels %}
+                        {% set outer_loop = loop %}
+                        <tr>
+                            <td>{{ row }}</td>
+                                {% for d in context.table_data %}
+                                    {% set point = d[context.fields[outer_loop.index0]] %}
+                                    {% set prev_point = context.full_data[loop.index0 + 1][context.fields[outer_loop.index0]] %}
+                                    <td class="
+                                        {% if point|float() < prev_point|float() %}
+                                            text-success
+                                        {% elif point|float() > prev_point|float() %}
+                                            text-danger
+                                        {% endif %}
+                                    ">
+                                        {{ point|round(2) }}
+                                    </td>
+                                {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <script>
+        function toggleLegend() {
+            chart.options.legend.display = !chart.options.legend.display;
+            chart.update();
+        }
+
+        var ctx = $("#chart");
+        var dataColours = [
+            {
+                "background": "#C82525",
+                "border": "#A45252"
+            },
+            {
+                "background": "#C86A25",
+                "border": "#A47552"
+            },
+            {
+                "background": "#C8A525",
+                "border": "#A49252"
+            },
+            {
+                "background": "#B7C825",
+                "border": "#9BA452"
+            },
+            {
+                "background": "#40C825",
+                "border": "#60A452"
+            },
+            {
+                "background": "#25C874",
+                "border": "#52A47A"
+            },
+            {
+                "background": "#25C8B2",
+                "border": "#52A499"
+            },
+            {
+                "background": "#25A0C8",
+                "border": "#5290A4"
+            },
+            {
+                "background": "#2551C8",
+                "border": "#5268A4"
+            },
+            {
+                "background": "#4F25C8",
+                "border": "#6752A4"
+            },
+            {
+                "background": "#B925C8",
+                "border": "#9C52A4"
+            }
+        ]
+ 
+        var chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [
+                    {% for t in context.chart_data.timestamps %}
+                        "{{ t.strftime('%d-%m') }}",
+                    {% endfor %}
+                ],
+                datasets: [
+                    {% for k,v in context.chart_data.items() %}
+                        {% if k != 'timestamps' %}
+                            {
+                                label: '{{ context.labels[loop.index0] }}',
+                                fill: false,
+                                backgroundColor: dataColours[{{loop.index0}}].background,
+                                borderColor: dataColours[{{loop.index0}}].border,
+                                data: [
+                                    {% for d in v %}
+                                        {{ d|safe|float }},
+                                    {% endfor %}
+                                ]
+                            },
+                        {% endif %}
+                    {% endfor %}
+                ]
+            },
+            options: {
+                legend: {
+                    display: false,
+                    labels: {
+                        fontColor: 'white'
+                    }
+                },
+                scales: {
+                    xAxes: [{ 
+                        gridLines: {
+                            display: false,
+                        },
+                        ticks: {
+                          fontColor: "white",
+                        }
+                    }],
+                    yAxes: [{
+                        gridLines: {
+                            display: false,
+                        },
+                        ticks: {
+                          fontColor: "white",
+                        }
+                    }],
+                }
+            }
+        });
+    </script>
+
+{% endblock %}

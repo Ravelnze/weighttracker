@@ -2,6 +2,8 @@ from app import app, db
 from flask import render_template, flash, redirect
 from app.models import User, UserMeasurement
 from app.forms import EntryForm
+from app.encoders import DecimalEncoder
+import json
 
 @app.route('/', methods=['GET', 'POST'])
 def entry():
@@ -25,6 +27,52 @@ def entry():
         db.session.commit()
         u = User.query.get(form.user.data)
         flash("Record added for {}".format(u.name))
+
         return redirect('/')
 
-    return render_template("entry.html", form=form)
+    users = User.query.all()
+
+    context = {
+        'form': form,
+        'users': users,
+        'route': "entry"
+    }
+
+    return render_template("entry.html", context=context)
+
+@app.route('/progress/<user_id>')
+def progress(user_id):
+
+    users = User.query.all()
+    user = next(u for u in users if u.id == int(user_id))
+    labels = [
+        'Chest',
+        'Upper Chest',
+        'Waist',
+        'Hips',
+        'Right Thigh',
+        'Left Thigh',
+        'Right Arm',
+        'Left Arm', 
+        'Belly Button', 
+        'Stomach',
+        'Weight'
+    ]
+    fields = ['_'.join(l.lower().split(' ')) for l in labels]
+
+    data = UserMeasurement.query.filter_by(user=int(user_id)).all()
+    chart_data = {f:[str(d.__getattribute__(f)) for d in data[-10:]] for f in fields}
+    chart_data['timestamps'] = [d.timestamp for d in data]
+
+    context = {
+        'full_data': data,
+        'table_data': data[-3:], 
+        'chart_data': chart_data,
+        'user': user,
+        'users': users,
+        'labels': labels,
+        'fields': fields,
+        'route': 'progress' + user.name
+    }
+
+    return render_template('progress.html', context=context)
