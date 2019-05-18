@@ -12,3 +12,7 @@ body {
     background-color: #200010;
     border-color: #200010;
 }
+
+.btn-complimentary:hover {
+    color: inherit;
+}

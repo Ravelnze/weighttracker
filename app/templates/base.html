@@ -2,10 +2,11 @@
 <html>
     <head>
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
             <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}">
             <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-            <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+            <script src="{{ url_for('static', filename='jquery/js/jquery.min.js') }}" ></script>
+            <script src="{{ url_for('static', filename='popper/js/popper.min.js') }}"></script>
             <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.min.js') }}"></script>
             <title>Tracker | {% block title %}{% endblock %}</title>
             {% block head %}
@@ -15,14 +16,13 @@
         <nav class="navbar navbar-dark bg-complimentary">
             <ul class="navbar-nav mr-auto flex-row justify-content-between">
                 <li class="nav-item mr-3">
-                    <a class="nav-link active" href="#">Entry</a>
+                    <a class="nav-link {% if context.route == 'entry' %}active{% endif %}" href="/">Entry</a>
                 </li>
-                <li class="nav-item mr-3">
-                    <a class="nav-link" href="#">Jerita</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Ash</a>
-                </li>
+                {% for user in context.users %}
+                    <li class="nav-item mr-3">
+                        <a class="nav-link {% if context.route == 'progress' + user.name %}active{% endif %}" href="/progress/{{ user.id|string }}">{{ user.name }}</a>
+                    </li>
+                {% endfor %}
             </ul>
         </nav>
 
@@ -54,5 +54,14 @@
                 </div>
             </div>
         </div>
+
+        <!-- <script>
+            $("button").on("touchstart", function(){ 
+                $(this).removeClass("mobileHoverFix");
+            });
+            $("button").on("touchend", function(){ 
+                $(this).addClass("mobileHoverFix");
+            });
+        </script> -->
     </body>
 </html>
