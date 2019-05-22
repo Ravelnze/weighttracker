@@ -2,6 +2,7 @@ from app import app, db
 from flask import render_template, flash, redirect
 from app.models import User, UserMeasurement
 from app.forms import EntryForm
+import datetime
 
 @app.route('/', methods=['GET', 'POST'])
 def entry():
@@ -9,6 +10,7 @@ def entry():
     if form.validate_on_submit():
         record = UserMeasurement(
             user = form.user.data,
+            timestamp = datetime.datetime.now(),
             chest = form.chest.data,
             upper_chest = form.upper_chest.data,
             waist = form.waist.data,
@@ -59,12 +61,14 @@ def progress(user_id):
     fields = ['_'.join(l.lower().split(' ')) for l in labels]
 
     data = UserMeasurement.query.filter_by(user=int(user_id)).all()
+    table_data = data[-3:]
     chart_data = {f:[str(d.__getattribute__(f)) for d in data[-10:]] for f in fields}
     chart_data['timestamps'] = [d.timestamp for d in data]
 
     context = {
         'full_data': data,
-        'table_data': data[-3:], 
+        'data_len': len(data),
+        'table_data': table_data, 
         'chart_data': chart_data,
         'user': user,
         'users': users,
