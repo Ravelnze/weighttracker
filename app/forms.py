@@ -1,9 +1,17 @@
 from flask_wtf import FlaskForm
 from wtforms import DecimalField, SubmitField, SelectField
 from wtforms.validators import DataRequired
+from app.models import User
+
 
 class EntryForm(FlaskForm):
-    user = SelectField("Person", choices=[("1","Jerita"), ("2","Ash")], validators=[DataRequired()])
+    users = User.query.all()
+
+    user = SelectField(
+        "Person",
+        choices=[(u.id, u.name) for u in users],
+        validators=[DataRequired()]
+    )
     chest = DecimalField("Chest")
     upper_chest = DecimalField("Upper Chest")
     waist = DecimalField("Waist")
