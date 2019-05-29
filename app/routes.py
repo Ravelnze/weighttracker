@@ -4,24 +4,25 @@ from app.models import User, UserMeasurement
 from app.forms import EntryForm
 import datetime
 
+
 @app.route('/', methods=['GET', 'POST'])
 def entry():
     form = EntryForm()
     if form.validate_on_submit():
         record = UserMeasurement(
-            user = form.user.data,
-            timestamp = datetime.datetime.now(),
-            chest = form.chest.data,
-            upper_chest = form.upper_chest.data,
-            waist = form.waist.data,
-            hips = form.hips.data,
-            right_thigh = form.right_thigh.data,
-            left_thigh = form.left_thigh.data,
-            right_arm = form.right_arm.data,
-            left_arm = form.left_arm.data,
-            belly_button = form.belly_button.data,
-            stomach = form.stomach.data,
-            weight = form.weight.data
+            user=form.user.data,
+            timestamp=datetime.datetime.now(),
+            chest=form.chest.data,
+            upper_chest=form.upper_chest.data,
+            waist=form.waist.data,
+            hips=form.hips.data,
+            right_thigh=form.right_thigh.data,
+            left_thigh=form.left_thigh.data,
+            right_arm=form.right_arm.data,
+            left_arm=form.left_arm.data,
+            belly_button=form.belly_button.data,
+            stomach=form.stomach.data,
+            weight=form.weight.data
         )
         db.session.add(record)
         db.session.commit()
@@ -39,6 +40,7 @@ def entry():
     }
 
     return render_template("entry.html", context=context)
+
 
 @app.route('/progress/<user_id>')
 def progress(user_id):
@@ -62,7 +64,9 @@ def progress(user_id):
 
     data = UserMeasurement.query.filter_by(user=int(user_id)).all()
     table_data = data[-3:]
-    chart_data = {f:[str(d.__getattribute__(f)) for d in data[-10:]] for f in fields}
+    chart_data = {
+        f: [str(d.__getattribute__(f)) for d in data[-10:]] for f in fields
+    }
     chart_data['timestamps'] = [d.timestamp for d in data]
 
     context = {
