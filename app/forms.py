@@ -10,7 +10,8 @@ class EntryForm(FlaskForm):
     user = SelectField(
         "Person",
         choices=[(u.id, u.name) for u in users],
-        validators=[DataRequired()]
+        validators=[DataRequired()],
+        coerce=int
     )
     chest = DecimalField("Chest")
     upper_chest = DecimalField("Upper Chest")
